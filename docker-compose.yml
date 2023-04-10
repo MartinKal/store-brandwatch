@@ -5,7 +5,7 @@ services:
     image: mongo:latest
     container_name: mongo-store
     ports:
-      - "27018:27018"
+      - "27018:27017"
     volumes:
       - mongodb_data:/data/db
 
