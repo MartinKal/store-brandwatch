@@ -11,6 +11,6 @@ public class StockShortage {
     @Id
     private ObjectId id;
     private String productId;
-    private String productName;
+    private String status;
     private Integer quantity;
 }
