@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReplenishStockRequest {
-    private List<ProductRequest> products;
+public class ProductData {
+    private List<Item> products;
 }
