@@ -5,12 +5,11 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "stockShortages")
+@Document(collection = "products")
 @Data
-public class StockShortage {
+public class Product {
     @Id
     private ObjectId id;
     private String productId;
-    private String productName;
     private Integer quantity;
 }
