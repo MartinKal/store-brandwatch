@@ -1,7 +1,6 @@
 package brandwatch.assessment.store.service;
 
 import brandwatch.assessment.store.dto.Item;
-import brandwatch.assessment.store.dto.ProductData;
 import brandwatch.assessment.store.dto.StockCheckResult;
 import brandwatch.assessment.store.exception.ProductNotFoundException;
 import brandwatch.assessment.store.exception.ProductOutOfStockException;
@@ -62,12 +61,10 @@ public class StockService {
     }
 
 
-    public List<Product> addOrUpdateStock(ProductData productData) {
+    public List<Product> addOrUpdateStock(List<Item> items) {
         List<Product> products = new ArrayList<>();
-        productData.getProducts().forEach(product -> {
-            Product p = new Product();
-            p.setQuantity(product.getQuantity());
-            p.setProductId(product.getProductId());
+        items.forEach(item -> {
+            Product p = new Product(item.getProductId(), item.getQuantity());
             Product saved = addOrReplenishProduct(p);
             products.add(saved);
         });

@@ -1,10 +1,9 @@
 package brandwatch.assessment.store.controller;
 
-import brandwatch.assessment.store.dto.Item;
-import brandwatch.assessment.store.dto.ProductData;
-import brandwatch.assessment.store.dto.StockCheckResult;
+import brandwatch.assessment.store.dto.LoadStockData;
 import brandwatch.assessment.store.model.Product;
 import brandwatch.assessment.store.service.StockService;
+import brandwatch.assessment.store.service.ValidationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/store/stock")
+@RequestMapping("/stock")
 public class StockController {
 
     private final StockService stockService;
+    private final ValidationService validationService;
 
-    public StockController(StockService stockService) {
+    public StockController(StockService stockService, ValidationService validationService) {
         this.stockService = stockService;
+        this.validationService = validationService;
     }
 
     @GetMapping("/shortages")
@@ -27,7 +28,7 @@ public class StockController {
         return ResponseEntity.ok(shortages);
     }
 
-    @GetMapping("/check/{productId}")
+    @GetMapping("/{productId}")
     public ResponseEntity<Integer> getStockByProductId(@PathVariable String productId) {
         Integer shortage = stockService.getStockByProductId(productId);
         if (shortage == null) {
@@ -37,13 +38,8 @@ public class StockController {
     }
 
     @PostMapping
-    public ResponseEntity<List<Product>> loadStock(@RequestBody ProductData productData) {
-        return ResponseEntity.ok(stockService.addOrUpdateStock(productData));
-    }
-
-    @PostMapping("check")
-    public ResponseEntity<StockCheckResult> checkStockAvailability(@RequestBody List<Item> items) {
-        StockCheckResult inStock = stockService.processOrderRequest(items);
-        return ResponseEntity.ok(inStock);
+    public ResponseEntity<List<Product>> loadStock(@RequestBody LoadStockData loadData) {
+        validationService.validateLoadStockData(loadData);
+        return ResponseEntity.ok(stockService.addOrUpdateStock(loadData.getItems()));
     }
 }
