@@ -1,6 +1,8 @@
 package brandwatch.assessment.store.controller;
 
+import brandwatch.assessment.store.dto.Item;
 import brandwatch.assessment.store.dto.ProductData;
+import brandwatch.assessment.store.dto.StockCheckResult;
 import brandwatch.assessment.store.model.Product;
 import brandwatch.assessment.store.service.StockService;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/store")
+@RequestMapping("/store/stock")
 public class StockController {
 
     private final StockService stockService;
@@ -25,7 +27,7 @@ public class StockController {
         return ResponseEntity.ok(shortages);
     }
 
-    @GetMapping("stock/{productId}")
+    @GetMapping("/check/{productId}")
     public ResponseEntity<Integer> getStockByProductId(@PathVariable String productId) {
         Integer shortage = stockService.getStockByProductId(productId);
         if (shortage == null) {
@@ -34,8 +36,14 @@ public class StockController {
         return ResponseEntity.ok(shortage);
     }
 
-    @PostMapping("/stock")
+    @PostMapping
     public ResponseEntity<List<Product>> loadStock(@RequestBody ProductData productData) {
         return ResponseEntity.ok(stockService.addOrUpdateStock(productData));
+    }
+
+    @PostMapping("check")
+    public ResponseEntity<StockCheckResult> checkStockAvailability(@RequestBody List<Item> items) {
+        StockCheckResult inStock = stockService.processOrderRequest(items);
+        return ResponseEntity.ok(inStock);
     }
 }
