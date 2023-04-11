@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ProductRepository extends MongoRepository<Product, ObjectId> {
     @Query(value = "{ 'productId' : ?0 }", fields = "{ '_id': 0, 'quantity': 1 }")
@@ -20,4 +21,6 @@ public interface ProductRepository extends MongoRepository<Product, ObjectId> {
 
     @Query(value = "{'productId' : ?0}")
     Optional<Product> findByProductId(String productId);
+
+    Set<Product> findAllByProductId(Set<String> ids);
 }
