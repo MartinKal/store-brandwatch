@@ -1,29 +1,26 @@
 package brandwatch.assessment.store.service;
 
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.params.XAddParams;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class RedisService {
+    private final RedisTemplate<String, String> redisTemplate;
 
-    private final JedisPool jedisPool;
-
-    public RedisService(JedisPool jedisPool) {
-        this.jedisPool = jedisPool;
+    public RedisService(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
     public void sendInStockMessage(String streamKey, Map<String, Integer> items) {
-        try(Jedis jedis = jedisPool.getResource()) {
-            Map<String, String> message = new HashMap<>();
-            items.forEach((key, value) -> {
-                message.put(key, String.valueOf(value));
-            });
-            jedis.xadd(streamKey, new XAddParams(), message);
-        }
+        StreamOperations<String, String, Object> streamOperations = redisTemplate.opsForStream();
+        Map<String, Object> message = new HashMap<>();
+        items.forEach((key, value) -> {
+            message.put(key, String.valueOf(value));
+        });
+        streamOperations.add(streamKey, message);
     }
 }
