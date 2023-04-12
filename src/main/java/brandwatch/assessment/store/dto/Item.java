@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Item {
     private String productId;
-    private Integer quantity;
+    private int quantity;
 }

@@ -17,10 +17,12 @@ public class Product {
     private ObjectId id;
     @Indexed
     private String productId;
-    private Integer quantity;
+    private int quantity;
+    private int needed;
 
-    public Product(String productId, Integer quantity) {
+    public Product(String productId, Integer quantity, Integer needed) {
         this.productId = productId;
         this.quantity = quantity;
+        this.needed = needed;
     }
 }

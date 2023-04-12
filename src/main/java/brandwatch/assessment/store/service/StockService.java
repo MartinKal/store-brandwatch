@@ -23,9 +23,9 @@ public class StockService {
     }
 
     public List<Map<String, Integer>> getAllStockShortages() {
-        return Collections.singletonList(productRepository.findOutOfStock()
+        return Collections.singletonList(productRepository.findShortages()
                 .stream()
-                .collect(Collectors.toMap(Product::getProductId, Product::getQuantity)));
+                .collect(Collectors.toMap(Product::getProductId, Product::getNeeded)));
     }
 
     public Integer getStockByProductId(String productId) {
@@ -46,6 +46,8 @@ public class StockService {
                     product.setQuantity(product.getQuantity() - item.getQuantity());
                     productRepository.save(product);
                 } else {
+                    product.setNeeded(product.getNeeded() + item.getQuantity() - product.getQuantity());
+                    productRepository.save(product);
                     throw new ProductOutOfStockException("Insufficient stock for product: " + product.getProductId());
                 }
             }
@@ -64,7 +66,7 @@ public class StockService {
     public List<Product> addOrUpdateStock(List<Item> items) {
         List<Product> products = new ArrayList<>();
         items.forEach(item -> {
-            Product p = new Product(item.getProductId(), item.getQuantity());
+            Product p = new Product(item.getProductId(), item.getQuantity(), 0 );
             Product saved = addOrReplenishProduct(p);
             products.add(saved);
         });
@@ -78,6 +80,7 @@ public class StockService {
         if (product.isPresent()) {
             Product existingProduct = product.get();
             existingProduct.setQuantity(existingProduct.getQuantity() + newProduct.getQuantity());
+            existingProduct.setNeeded(Math.max(0, existingProduct.getNeeded() - newProduct.getQuantity()));
             return productRepository.save(existingProduct);
         } else {
             return productRepository.save(newProduct);

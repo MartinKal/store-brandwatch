@@ -13,8 +13,8 @@ public interface ProductRepository extends MongoRepository<Product, ObjectId> {
     @Query(value = "{ 'productId' : ?0 }", fields = "{ '_id': 0, 'quantity': 1 }")
     Optional<Product> findStockByProductId(String productId);
 
-    @Query(value = "{ 'quantity' : {'$lt' : 0 }}")
-    List<Product> findOutOfStock();
+    @Query(value = "{ 'needed' : {'$gt' : 0 }}")
+    List<Product> findShortages();
 
     @Query(value = "{'productId' : ?0}", fields = "{'quantity': 1}")
     Optional<Integer> findQuantityByProductId(String productId);
