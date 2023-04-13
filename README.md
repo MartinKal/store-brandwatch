@@ -25,8 +25,9 @@ Runs on ```http://localhost:8081```
 **Method:** POST <br />
 **Request Body:** A JSON object containing a list of items with product ID and quantity. <br />
 **Description:** This endpoint loads or updates the stock with the provided items. It also sends a message with the updated stock information
-to a Redis topic triggering all pending orders that can be completed to be retried.
+to a Redis topic triggering all pending orders that can be completed to be retried.<br/>
 
+Request example:
 ```
 {
   "items": [
