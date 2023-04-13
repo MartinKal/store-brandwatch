@@ -1,7 +1,7 @@
 package brandwatch.assessment.store.controller;
 
 import brandwatch.assessment.store.dto.ShopOrderData;
-import brandwatch.assessment.store.dto.StockCheckResult;
+import brandwatch.assessment.store.dto.CompleteOrderResult;
 import brandwatch.assessment.store.service.StockService;
 import brandwatch.assessment.store.service.ValidationService;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +23,9 @@ public class OrderProcessorController {
     }
 
     @PostMapping("/process")
-    public ResponseEntity<StockCheckResult> processShopOrder(@RequestBody ShopOrderData orderData) {
+    public ResponseEntity<CompleteOrderResult> processShopOrderStock(@RequestBody ShopOrderData orderData) {
         validationService.validateShopOrderData(orderData);
-        StockCheckResult inStock = stockService.processOrderRequest(orderData.getItems());
+        CompleteOrderResult inStock = stockService.ProcessOrderStock(orderData.getItems(), orderData.getOrderReferenceId());
         return ResponseEntity.ok(inStock);
     }
 }
