@@ -25,12 +25,6 @@ public class StockService {
                 .collect(Collectors.toMap(Product::getProductId, Product::getNeeded)));
     }
 
-    public Integer getStockByProductId(String productId) {
-        Optional<Integer> shortage = productRepository.findStockByProductId(productId)
-                .map(Product::getQuantity);
-        return shortage.orElse(null);
-    }
-
     public CompleteOrderResult ProcessOrderStock(List<Item> items, String orderReferenceId) {
         boolean updateQuantity = true;
         Map<String, Integer> itemHashSet = items
@@ -39,7 +33,7 @@ public class StockService {
 
         Set<Product> products = productRepository
                 .findAllByProductId(items.stream().map(Item::getProductId).collect(Collectors.toSet()));
-        if (products.isEmpty()) {
+        if (products.isEmpty() || products.size() != items.size()) {
             return new CompleteOrderResult(false, orderReferenceId);
         }
 
@@ -72,6 +66,16 @@ public class StockService {
         return new CompleteOrderResult(false, orderReferenceId);
     }
 
+    public List<Product> addOrUpdateStock(List<Item> items) {
+        List<Product> products = new ArrayList<>();
+        for (Item item : items) {
+            Product p = new Product(item.getProductId(), item.getQuantity(), 0);
+            Product saved = addOrReplenishProduct(p);
+            products.add(saved);
+        }
+        return products;
+    }
+
     private void updateProductQuantities(Map<Product, Pair<Integer, Integer>> productsMap) {
         List<Product> products = new ArrayList<>();
         for (Map.Entry<Product, Pair<Integer, Integer>> entry : productsMap.entrySet()) {
@@ -83,16 +87,6 @@ public class StockService {
             products.add(p);
         }
         productRepository.saveAll(products);
-    }
-
-    public List<Product> addOrUpdateStock(List<Item> items) {
-        List<Product> products = new ArrayList<>();
-        items.forEach(item -> {
-            Product p = new Product(item.getProductId(), item.getQuantity(), 0);
-            Product saved = addOrReplenishProduct(p);
-            products.add(saved);
-        });
-        return products;
     }
 
     private Product addOrReplenishProduct(Product newProduct) {
