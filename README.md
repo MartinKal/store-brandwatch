@@ -17,6 +17,11 @@ Keep in mind the shop component requires the same Redis instance so it should be
 3. Navigate to Shop component root, create a JAR with ```./mvnw clean package```, and execute again ```docker-compose up``` to start the Shop app and it's MongoDb instance.
 4. The 2 apps should be running at this point
 
+## Store component
+The Store component works with the products in stock. The user of this component is a supplier
+who should be able to check if the Store needs to be loaded with more products required by clients
+in the Shop component and load the needed products.<br/>
+
 ## Store component api
 
 Runs on ```http://localhost:8080```
