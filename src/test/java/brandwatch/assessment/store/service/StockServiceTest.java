@@ -65,7 +65,7 @@ public class StockServiceTest {
         when(repository.findAllByProductId(any())).thenReturn(products);
 
         // When
-        CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId);
+        CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId, false);
 
         // Then
         assertTrue(result.isSuccess());
@@ -87,7 +87,7 @@ public class StockServiceTest {
         when(repository.findAllByProductId(any())).thenReturn(products);
 
         // When
-        CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId);
+        CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId, false);
 
         // Then
         assertFalse(result.isSuccess());
@@ -108,7 +108,7 @@ public class StockServiceTest {
         when(repository.findAllByProductId(any())).thenReturn(products);
 
         // When
-        CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId);
+        CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId, false);
 
         // Then
         assertFalse(result.isSuccess());

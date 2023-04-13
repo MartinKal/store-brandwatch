@@ -14,4 +14,5 @@ public class ShopOrderData {
     private String orderReferenceId;
     @NonNull
     private List<Item> items;
+    boolean retriedOrder;
 }
