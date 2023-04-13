@@ -1,14 +1,11 @@
 package brandwatch.assessment.store.service;
 
 import brandwatch.assessment.store.dto.Item;
-import brandwatch.assessment.store.dto.StockCheckResult;
-import brandwatch.assessment.store.exception.ProductNotFoundException;
-import brandwatch.assessment.store.exception.ProductOutOfStockException;
+import brandwatch.assessment.store.dto.CompleteOrderResult;
 import brandwatch.assessment.store.model.Product;
 import brandwatch.assessment.store.repository.ProductRepository;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,45 +31,69 @@ public class StockService {
         return shortage.orElse(null);
     }
 
-    @Transactional
-    public StockCheckResult processOrderRequest(List<Item> items) {
-        StockCheckResult result = new StockCheckResult();
-        try {
-            for (Item item : items) {
-                Product product = productRepository.findByProductId(item.getProductId())
-                        .orElseThrow(() -> new ProductNotFoundException("Product not found"));
+    public CompleteOrderResult ProcessOrderStock(List<Item> items, String orderReferenceId) {
+        boolean updateQuantity = true;
+        Map<String, Integer> itemHashSet = items
+                .stream()
+                .collect(Collectors.toMap(Item::getProductId, Item::getQuantity));
 
-                if (product.getQuantity() >= item.getQuantity()) {
-                    product.setQuantity(product.getQuantity() - item.getQuantity());
-                    productRepository.save(product);
-                } else {
-                    product.setNeeded(product.getNeeded() + item.getQuantity() - product.getQuantity());
-                    productRepository.save(product);
-                    throw new ProductOutOfStockException("Insufficient stock for product: " + product.getProductId());
-                }
-            }
-            result.setSuccess(true);
-            result.setMessage("Products are in stock.");
-        } catch (ProductNotFoundException | ProductOutOfStockException ex) {
-            result.setSuccess(false);
-            result.setMessage(ex.getMessage());
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        Set<Product> products = productRepository
+                .findAllByProductId(items.stream().map(Item::getProductId).collect(Collectors.toSet()));
+        if (products.isEmpty()) {
+            return new CompleteOrderResult(false, orderReferenceId);
         }
 
-        return result;
+        // key - product 2. value (new quantity, needed)
+        Map<Product, Pair<Integer, Integer>> productsMap = new HashMap<>();
+
+        for (Product product : products) {
+            int itemQuantity = itemHashSet.get(product.getProductId());
+            int productNeeded = product.getNeeded();
+            int productQuantity = product.getQuantity();
+            int quantityDiff = productQuantity - itemQuantity;
+
+            if (productNeeded > 0) {
+                productNeeded += itemQuantity;
+                updateQuantity = false;
+            } else if (quantityDiff >= 0) {
+                productQuantity = quantityDiff;
+            } else {
+                productNeeded = Math.abs(quantityDiff);
+                updateQuantity = false;
+            }
+            productsMap.put(product, Pair.of(productQuantity, productNeeded));
+        }
+
+        updateProductQuantities(productsMap);
+        if (updateQuantity) {
+            return new CompleteOrderResult(true, orderReferenceId);
+        }
+
+        return new CompleteOrderResult(false, orderReferenceId);
     }
 
+    private void updateProductQuantities(Map<Product, Pair<Integer, Integer>> productsMap) {
+        List<Product> products = new ArrayList<>();
+        for (Map.Entry<Product, Pair<Integer, Integer>> entry : productsMap.entrySet()) {
+            Product p = entry.getKey();
+            int quantity = entry.getValue().getFirst();
+            int needed = entry.getValue().getSecond();
+            p.setQuantity(quantity);
+            p.setNeeded(needed);
+            products.add(p);
+        }
+        productRepository.saveAll(products);
+    }
 
     public List<Product> addOrUpdateStock(List<Item> items) {
         List<Product> products = new ArrayList<>();
         items.forEach(item -> {
-            Product p = new Product(item.getProductId(), item.getQuantity(), 0 );
+            Product p = new Product(item.getProductId(), item.getQuantity(), 0);
             Product saved = addOrReplenishProduct(p);
             products.add(saved);
         });
         return products;
     }
-
 
     private Product addOrReplenishProduct(Product newProduct) {
         Optional<Product> product = productRepository.findByProductId(newProduct.getProductId());

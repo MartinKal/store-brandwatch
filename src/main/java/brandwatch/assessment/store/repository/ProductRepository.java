@@ -22,5 +22,6 @@ public interface ProductRepository extends MongoRepository<Product, ObjectId> {
     @Query(value = "{'productId' : ?0}")
     Optional<Product> findByProductId(String productId);
 
+    @Query(value = "{'productId' : { $in: ?0 }}")
     Set<Product> findAllByProductId(Set<String> ids);
 }
