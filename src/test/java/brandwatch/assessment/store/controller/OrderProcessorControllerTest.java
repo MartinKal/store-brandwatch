@@ -47,18 +47,17 @@ public class OrderProcessorControllerTest {
 
     @Test
     void processShopOrderStockTest() throws Exception {
-        // Prepare test data
+        // Given
         ShopOrderData orderData = new ShopOrderData(
                 "order1",
                 List.of(new Item("p1", 5))
         );
         CompleteOrderResult expectedResult = new CompleteOrderResult(true, "order1");
 
-        // Mock services
         doNothing().when(validationService).validateShopOrderData(orderData);
         when(stockService.ProcessOrderStock(orderData.getItems(), orderData.getOrderReferenceId())).thenReturn(expectedResult);
 
-        // Test controller method
+        // When-Then
         mockMvc.perform(post("/products/process")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(orderData)))

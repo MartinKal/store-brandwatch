@@ -35,12 +35,16 @@ public class StockServiceTest {
 
     @Test
     void testGetAllStockShortages() {
+        // Given
         Product product1 = new Product("product1", 10, 5);
         Product product2 = new Product("product2", 5, 3);
+
         when(repository.findShortages()).thenReturn(List.of(product1, product2));
 
+        // When
         List<Map<String, Integer>> result = stockService.getAllStockShortages();
 
+        // Then
         assertEquals(1, result.size());
         assertEquals(5, result.get(0).get("product1"));
         assertEquals(3, result.get(0).get("product2"));
@@ -48,6 +52,7 @@ public class StockServiceTest {
 
     @Test
     void testProcessOrderStockSUCCESS() {
+        // Given
         String orderReferenceId = "order1";
         List<Item> items = List.of(new Item("p1", 5), new Item("p2", 9));
         Set<Product> products = new HashSet<>(
@@ -59,14 +64,17 @@ public class StockServiceTest {
 
         when(repository.findAllByProductId(any())).thenReturn(products);
 
+        // When
         CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId);
 
+        // Then
         assertTrue(result.isSuccess());
         assertEquals(orderReferenceId, result.getOrderReferenceId());
     }
 
     @Test
     void testProcessOrderStockNotEnoughStock() {
+        // Given
         String orderReferenceId = "order1";
         List<Item> items = List.of(new Item("p1", 5), new Item("p2", 9));
         Set<Product> products = new HashSet<>(
@@ -78,15 +86,17 @@ public class StockServiceTest {
 
         when(repository.findAllByProductId(any())).thenReturn(products);
 
+        // When
         CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId);
 
+        // Then
         assertFalse(result.isSuccess());
         assertEquals(orderReferenceId, result.getOrderReferenceId());
     }
 
     @Test
     void testProcessOrderStockItemNotFound() {
-        // Prepare test data
+        // Given
         String orderReferenceId = "order1";
         List<Item> items = List.of(new Item("p1", 5), new Item("p2", 9));
         Set<Product> products = new HashSet<>(
@@ -97,26 +107,27 @@ public class StockServiceTest {
 
         when(repository.findAllByProductId(any())).thenReturn(products);
 
+        // When
         CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId);
 
+        // Then
         assertFalse(result.isSuccess());
         assertEquals(orderReferenceId, result.getOrderReferenceId());
     }
 
     @Test
     void testStockUpdateSUCCESS() {
-        // Prepare test data
+        // Given
         List<Item> items = List.of(new Item("p1", 5));
         Product product = new Product("p1", 10, 0);
 
-        // Mock repository
         when(repository.findByProductId(anyString())).thenReturn(Optional.of(product));
         when(repository.save(any())).thenReturn(product);
 
-        // Test service method
+        // When
         List<Product> updatedProducts = stockService.addOrUpdateStock(items);
 
-        // Verify results
+        // Then
         assertEquals(1, updatedProducts.size());
         assertEquals(15, updatedProducts.get(0).getQuantity());
         assertEquals("p1", updatedProducts.get(0).getProductId());
@@ -124,19 +135,19 @@ public class StockServiceTest {
 
     @Test
     void testAddNewStockSUCCESS() {
-        // Prepare test data
+        // Given
         List<Item> items = List.of(new Item("p1", 5), new Item("p2", 4));
         Product product = new Product("p1", 10, 0);
         Product newProduct = new Product("p2", 4, 0);
 
-        // Mock repository
         when(repository.findByProductId("p1")).thenReturn(Optional.of(product));
         when(repository.save(product)).thenReturn(product);
         when(repository.save(newProduct)).thenReturn(newProduct);
-        // Test service method
+
+        // When
         List<Product> updatedProducts = stockService.addOrUpdateStock(items);
 
-        // Verify results
+        // Then
         assertEquals(2, updatedProducts.size());
         assertEquals(15, updatedProducts.get(0).getQuantity());
         assertEquals(4, updatedProducts.get(1).getQuantity());
