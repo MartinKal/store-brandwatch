@@ -33,12 +33,12 @@ Request example:
 {
   "items": [
     {
-      "productId": "product1",
-      "quantity": 5
+      "productId": "<product_id>",
+      "quantity": <quantity>
     },
     {
-      "productId": "product2",
-      "quantity": 10
+      "productId": "<product_id>",
+      "quantity": <quantity>
     }
   ]
 }
@@ -49,12 +49,12 @@ Response example:<br />
 {
   "items": [
     {
-      "productId": "product1",
-      "quantity": 5
+      "productId": "<product_id>",
+      "quantity": <quantity>
     },
     {
-      "productId": "product2",
-      "quantity": 10
+      "productId": "<product_id>",
+      "quantity": <quantity>
     }
   ]
 }
@@ -68,10 +68,10 @@ Response example:
 ```
 [
   {
-    "product1": 5
+    "product1": <quantity>
   },
   {
-    "product2": 10
+    "product2": <quantity>
   }
 ]
 ```
@@ -86,15 +86,15 @@ It returns a result indicating whether the order can be completed or not.
 Request body example:
 ```
 {
-  "orderReferenceId": "order123", // orderRefernceId can be omitted
+  "orderReferenceId": "<orderId>", // orderRefernceId can be omitted
   "items": [
     {
-      "productId": "product1",
-      "quantity": 5
+      "productId": "<product_id>",
+      "quantity": <quantity>
     },
     {
-      "productId": "product2",
-      "quantity": 10
+      "productId": "<product_id>",
+      "quantity": <quantity>
     }
   ]
 }
@@ -103,7 +103,7 @@ Response example:
 ```
 {
   "success": true,
-  "orderReferenceId": "order123"
+  "orderReferenceId": "<order_id>"
 }
 ```
 
@@ -152,12 +152,12 @@ Example:
 curl -X POST -H "Content-Type: application/json" -d '{
   "items": [
     {
-      "productId": "product-1",
-      "quantity": 2
+      "productId": "<product_id>",
+      "quantity": <quantity>
     },
     {
-      "productId": "product-2",
-      "quantity": 1
+      "productId": "<product_id>",
+      "quantity": <quantity>
     }
   ]
 }' http://localhost:8080/orders
