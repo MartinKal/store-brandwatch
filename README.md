@@ -9,11 +9,12 @@ Requires docker
 
 1. Clone this repository.
 2. Navigate to Store app project root:
-- execute ```docker network create shared-network``` to create docker network.
 
+- execute ```docker network create shared-network``` to create docker network.
+- create a JAR using ```./mvnw clean package``` if you are using IntelliJ
 - execute docker-compose up. It should start 3 docker containers (Stock app, MongoDB, Redis).
 Keep in mind the shop component requires the same Redis instance so it should be started after this one.
-3. Navigate to Shop component root and execute again ```docker-compose up``` to start the Shop app and it's MongoDb instance.
+3. Navigate to Shop component root, create a JAR with ```./mvnw clean package```, and execute again ```docker-compose up``` to start the Shop app and it's MongoDb instance.
 4. The 2 apps should be running at this point
 
 ## Store component api
