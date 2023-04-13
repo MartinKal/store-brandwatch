@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CompleteOrderResult {
     private boolean success;
-    private String productReferenceId;
+    private String orderReferenceId;
 }

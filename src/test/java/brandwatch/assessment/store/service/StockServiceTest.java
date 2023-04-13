@@ -62,7 +62,7 @@ public class StockServiceTest {
         CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId);
 
         assertTrue(result.isSuccess());
-        assertEquals(orderReferenceId, result.getProductReferenceId());
+        assertEquals(orderReferenceId, result.getOrderReferenceId());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class StockServiceTest {
         CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId);
 
         assertFalse(result.isSuccess());
-        assertEquals(orderReferenceId, result.getProductReferenceId());
+        assertEquals(orderReferenceId, result.getOrderReferenceId());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class StockServiceTest {
         CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId);
 
         assertFalse(result.isSuccess());
-        assertEquals(orderReferenceId, result.getProductReferenceId());
+        assertEquals(orderReferenceId, result.getOrderReferenceId());
     }
 
     @Test
