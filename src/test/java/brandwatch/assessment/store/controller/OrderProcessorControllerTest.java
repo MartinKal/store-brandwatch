@@ -50,12 +50,13 @@ public class OrderProcessorControllerTest {
         // Given
         ShopOrderData orderData = new ShopOrderData(
                 "order1",
-                List.of(new Item("p1", 5))
+                List.of(new Item("p1", 5)),
+                false
         );
         CompleteOrderResult expectedResult = new CompleteOrderResult(true, "order1");
 
         doNothing().when(validationService).validateShopOrderData(orderData);
-        when(stockService.ProcessOrderStock(orderData.getItems(), orderData.getOrderReferenceId())).thenReturn(expectedResult);
+        when(stockService.ProcessOrderStock(orderData.getItems(), orderData.getOrderReferenceId(), false)).thenReturn(expectedResult);
 
         // When-Then
         mockMvc.perform(post("/products/process")

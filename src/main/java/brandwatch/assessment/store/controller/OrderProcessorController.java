@@ -25,7 +25,8 @@ public class OrderProcessorController {
     @PostMapping("/process")
     public ResponseEntity<CompleteOrderResult> processShopOrderStock(@RequestBody ShopOrderData orderData) {
         validationService.validateShopOrderData(orderData);
-        CompleteOrderResult inStock = stockService.ProcessOrderStock(orderData.getItems(), orderData.getOrderReferenceId());
+        CompleteOrderResult inStock = stockService
+                .ProcessOrderStock(orderData.getItems(), orderData.getOrderReferenceId(), orderData.isRetriedOrder());
         return ResponseEntity.ok(inStock);
     }
 }
