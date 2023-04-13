@@ -16,9 +16,9 @@ Keep in mind the shop component requires the same Redis instance so it should be
 3. Navigate to Shop component root and execute again ```docker-compose up``` to start the Shop app and it's MongoDb instance.
 4. The 2 apps should be running at this point
 
-## Endpoints Shop
+## Store component api
 
-Runs on ```http://localhost:8081```
+Runs on ```http://localhost:8080```
 
 ### 1. Load Stock <br />
 **URL:** /stock <br />
@@ -103,5 +103,74 @@ Response example:
 {
   "success": true,
   "orderReferenceId": "order123"
+}
+```
+
+## Shop component api
+
+Runs on ```http://localhost:8081```
+
+**Create Order**<br/>
+**Method: POST**<br/>
+**Path:** /orders <br/>
+**Description:** Creates a new order using the provided request data.<br/>
+
+Request body example:
+```
+{
+  "items": [
+    {
+      "productId": "<product_id>",
+      "quantity": <quantity>
+    },
+    ...
+  ]
+}
+```
+items: An array of items in the order.<br/>
+productId: The identifier of the product.<br/>
+quantity: The quantity of the product in the order.<br/>
+
+**Response**<br/>
+**Status Code: 200 OK**<br/>
+**Body:**<br/>
+```
+{
+  "message": "<order_status>"
+}
+```
+**message:** A string describing the order status. Possible values are:<br/>
+- "Order completed.": The order was successfully completed.
+- "Order pending.": The order is pending due to stock unavailability.
+
+Usage
+To create a new order, send a POST request to ```/orders``` with the required data in the request body.
+
+Example:
+```
+curl -X POST -H "Content-Type: application/json" -d '{
+  "items": [
+    {
+      "productId": "product-1",
+      "quantity": 2
+    },
+    {
+      "productId": "product-2",
+      "quantity": 1
+    }
+  ]
+}' http://localhost:8080/orders
+```
+
+A successful response will have a status code of 200 OK and a JSON object with the order status message:
+```
+{
+  "message": "Order completed."
+}
+```
+In case the order is pending due to stock unavailability, the response will be:
+```
+{
+  "message": "Order pending."
 }
 ```
