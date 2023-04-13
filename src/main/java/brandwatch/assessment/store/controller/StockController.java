@@ -32,15 +32,6 @@ public class StockController {
         return ResponseEntity.ok(shortages);
     }
 
-    @GetMapping("/{productId}")
-    public ResponseEntity<Integer> getStockByProductId(@PathVariable String productId) {
-        Integer shortage = stockService.getStockByProductId(productId);
-        if (shortage == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(shortage);
-    }
-
     @PostMapping
     public ResponseEntity<List<Product>> loadStock(@RequestBody LoadStockData loadData) {
         validationService.validateLoadStockData(loadData);
