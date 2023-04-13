@@ -1,6 +1,8 @@
 package brandwatch.assessment.store.controller;
 
-import brandwatch.assessment.store.dto.LoadStockData;
+import brandwatch.assessment.store.dto.Item;
+import brandwatch.assessment.store.dto.LoadStockRequest;
+import brandwatch.assessment.store.dto.LoadStockResult;
 import brandwatch.assessment.store.model.Product;
 import brandwatch.assessment.store.service.RedisService;
 import brandwatch.assessment.store.service.StockService;
@@ -33,13 +35,22 @@ public class StockController {
     }
 
     @PostMapping
-    public ResponseEntity<List<Product>> loadStock(@RequestBody LoadStockData loadData) {
+    public ResponseEntity<LoadStockResult> loadStock(@RequestBody LoadStockRequest loadData) {
         validationService.validateLoadStockData(loadData);
         List<Product> products = stockService.addOrUpdateStock(loadData.getItems());
         Map<String, Integer> items = products
                 .stream()
                 .collect(Collectors.toMap(Product::getProductId, Product::getQuantity));
         redisService.sendInStockMessage("stock:load", items);
-        return ResponseEntity.ok(products);
+
+        return ResponseEntity.ok(
+                new LoadStockResult(
+                        items
+                                .entrySet()
+                                .stream()
+                                .map(entry -> new Item(entry.getKey(), entry.getValue()))
+                                .collect(Collectors.toList())
+                )
+        );
     }
 }

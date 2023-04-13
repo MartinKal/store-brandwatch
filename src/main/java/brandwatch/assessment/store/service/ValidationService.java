@@ -1,7 +1,7 @@
 package brandwatch.assessment.store.service;
 
 import brandwatch.assessment.store.dto.Item;
-import brandwatch.assessment.store.dto.LoadStockData;
+import brandwatch.assessment.store.dto.LoadStockRequest;
 import brandwatch.assessment.store.dto.ShopOrderData;
 import brandwatch.assessment.store.exception.IllegalItemData;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class ValidationService {
 
-    public void validateLoadStockData(LoadStockData data) {
+    public void validateLoadStockData(LoadStockRequest data) {
         validateListOfItems(data.getItems());
     }
 
