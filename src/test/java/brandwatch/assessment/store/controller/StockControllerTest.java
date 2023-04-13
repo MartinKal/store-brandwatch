@@ -53,12 +53,14 @@ public class StockControllerTest {
 
     @Test
     public void getAllStockShortagesTest() throws Exception {
+        // Given
         Map<String, Integer> shortages = new HashMap<>() {{
             put("item1", 5);
             put("item2", 15);
         }};
         when(stockService.getAllStockShortages()).thenReturn(List.of(shortages));
 
+        // When-Then
         mockMvc.perform(get("/stock/shortages"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -68,6 +70,7 @@ public class StockControllerTest {
 
     @Test
     public void loadStockTest() throws Exception {
+        // Given
         List<Item> items = List.of(
                 new Item("p1", 5),
                 new Item("p2", 10)
@@ -81,6 +84,7 @@ public class StockControllerTest {
 
         when(stockService.addOrUpdateStock(items)).thenReturn(products);
 
+        // When-Then
         mockMvc.perform(post("/stock")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loadData)))
