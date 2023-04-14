@@ -11,11 +11,13 @@ Requires docker
 2. Navigate to Store app project root:
 
 - execute ```docker network create shared-network``` to create docker network.
-- create a JAR using ```./mvnw clean package``` if you are using IntelliJ
-- execute docker-compose up. It should start 3 docker containers (Stock app, MongoDB, Redis).
-Keep in mind the shop component requires the same Redis instance so it should be started after this one.
-3. Navigate to Shop component root, create a JAR with ```./mvnw clean package```, and execute again ```docker-compose up``` to start the Shop app and it's MongoDb instance.
-4. The 2 apps should be running at this point
+- execute ```docker-compose up --build```. It should start 3 docker containers - store, mongo-store and redis-store. The Store is now running and listening to ```http://localhost:8080```<br/>
+
+- now clone shop repository
+- navigate to root folder
+- execute ```docker-compose up --build```. It should start 2 docker containers - shop and mongo-shop. Shop is listening to ```http://localhost:8081```
+Keep in mind the shop component requires the same Redis instance from the store, so it should be started after it.<br/>
+3. The 2 apps should be running at this point
 
 ## Store component
 The Store component works with the products in stock. The user of this component is a supplier
