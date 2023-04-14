@@ -25,8 +25,8 @@ public class ValidationService {
                 throw new IllegalItemData("Product name cannot be blank.");
             }
 
-            if (lineItem.getQuantity() < 1) {
-                throw new IllegalItemData("Quantity should be at least 1.");
+            if (lineItem.getQuantity() < 0) {
+                throw new IllegalItemData("Quantity cannot be negative.");
             }
         });
     }

@@ -38,7 +38,7 @@ public class StockService {
         }
 
         // key - product 2. value (new quantity, needed)
-        Map<Product, Pair<Integer, Integer>> productsMap = new HashMap<>();
+        Map<String, Pair<Integer, Integer>> productsMap = new HashMap<>();
 
         for (Product product : products) {
             int itemQuantity = itemHashSet.get(product.getProductId());
@@ -48,6 +48,9 @@ public class StockService {
 
             if (quantityDiff >= 0) {
                 productQuantity = quantityDiff;
+                if (productNeeded > 0) {
+                    productNeeded += itemQuantity;
+                }
             } else if (productNeeded > 0) {
                 productNeeded += itemQuantity;
                 updateQuantity = false;
@@ -56,7 +59,7 @@ public class StockService {
                 updateQuantity = false;
             }
 
-            productsMap.put(product, Pair.of(productQuantity, productNeeded));
+            productsMap.put(product.getProductId(), Pair.of(productQuantity, productNeeded));
         }
         if (!isRetried) {
             updateProductNeeded(products, productsMap);
@@ -80,17 +83,17 @@ public class StockService {
         return products;
     }
 
-    private void updateProductQuantities(Set<Product> products, Map<Product, Pair<Integer, Integer>> productsMap) {
-        for (Product product:  products) {
-            int quantity = productsMap.get(product).getFirst();
+    private void updateProductQuantities(Set<Product> products, Map<String, Pair<Integer, Integer>> productsMap) {
+        for (Product product: products) {
+            int quantity = productsMap.get(product.getProductId()).getFirst();
             product.setQuantity(quantity);
         }
         productRepository.saveAll(products);
     }
 
-    private void updateProductNeeded(Set<Product> products, Map<Product, Pair<Integer, Integer>> productsMap) {
+    private void updateProductNeeded(Set<Product> products, Map<String, Pair<Integer, Integer>> productsMap) {
         for (Product product : products) {
-            int needed = productsMap.get(product).getSecond();
+            int needed = productsMap.get(product.getProductId()).getSecond();
             product.setNeeded(needed);
         }
         productRepository.saveAll(products);
