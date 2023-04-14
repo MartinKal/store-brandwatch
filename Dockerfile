@@ -1,14 +1,14 @@
-# Start with a base image
-FROM openjdk:17-alpine3.14
+# Use an official OpenJDK runtime as a parent image
+FROM openjdk:17-alpine
 
-# Set the working directory inside the container
+# Set the working directory to /app
 WORKDIR /app
 
-# Copy the executable jar file and other necessary files to the container
-COPY target/store-0.0.1-SNAPSHOT.jar /app/store.jar
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Expose the port that the application will listen on
-EXPOSE 8080
+# Build the application
+RUN ./mvnw clean package -DskipTests
 
-# Define the command to run the application when the container starts
-CMD ["java", "-jar", "/app/store.jar"]
+# Set the default command to run the application when the container starts
+CMD ["java", "-jar", "target/store-0.0.1-SNAPSHOT.jar"]
