@@ -11,13 +11,15 @@ Requires docker
 2. Navigate to Store app project root:
 
 - execute ```docker network create shared-network``` to create docker network.
-- execute ```docker-compose up --build```. It should start 3 docker containers - store, mongo-store and redis-store. The Store is now running and listening to ```http://localhost:8080```<br/>
+- execute ```docker-compose up --build```. It should start 3 docker containers - store, mongo-store and redis-store. The Store is now running and listening to ```http://localhost:8090```<br/>
 
 - now clone shop repository
 - navigate to root folder
-- execute ```docker-compose up --build```. It should start 2 docker containers - shop and mongo-shop. Shop is listening to ```http://localhost:8081```
+- execute ```docker-compose up --build```. It should start 2 docker containers - shop and mongo-shop. Shop is listening to ```http://localhost:8091```
 Keep in mind the shop component requires the same Redis instance from the store, so it should be started after it.<br/>
 3. The 2 apps should be running at this point
+
+**Note** The two services (Shop, Store) can also be run from the IDE. But they are started on different ports: When started from the IDE, the Store is listening to localhost:8080 and the Shop - localhost:8081
 
 ## Store component
 The Store component works with the products in stock. The user of this component is a supplier
@@ -26,7 +28,7 @@ in the Shop component and load the needed products.<br/>
 
 ## Store component api
 
-Runs on ```http://localhost:8080```
+Runs on ```http://localhost:8090```
 
 ### 1. Load Stock <br />
 **URL:** /stock <br />
@@ -119,7 +121,7 @@ available, their orders are processed, and the products are taken from the store
 
 ## Shop component api
 
-Runs on ```http://localhost:8081```
+Runs on ```http://localhost:8091```
 
 **Create Order**<br/>
 **Method: POST**<br/>
@@ -170,7 +172,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
       "quantity": <quantity>
     }
   ]
-}' http://localhost:8080/orders
+}' http://localhost:8091/orders
 ```
 
 A successful response will have a status code of 200 OK and a JSON object with the order status message:
