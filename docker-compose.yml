@@ -25,10 +25,11 @@ services:
     container_name: store
     restart: always
     ports:
-      - 8080:8080
+      - 8090:8090
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27018/store
       SPRING_REDIS_URL: redis://redis:6379
+      SERVER_PORT: 8090
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
       - mongodb
