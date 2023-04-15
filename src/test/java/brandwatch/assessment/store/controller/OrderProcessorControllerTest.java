@@ -1,8 +1,8 @@
 package brandwatch.assessment.store.controller;
 
-import brandwatch.assessment.store.dto.CompleteOrderResult;
-import brandwatch.assessment.store.dto.Item;
-import brandwatch.assessment.store.dto.ShopOrderData;
+import brandwatch.assessment.store.model.ProcessedOrder;
+import brandwatch.assessment.store.dto.OrderData;
+import brandwatch.assessment.store.model.Item;
 import brandwatch.assessment.store.service.StockService;
 import brandwatch.assessment.store.service.ValidationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,22 +47,21 @@ public class OrderProcessorControllerTest {
     @Test
     void processShopOrderStockTest() throws Exception {
         // Given
-        ShopOrderData orderData = new ShopOrderData(
-                "order1",
+        OrderData orderData = new OrderData(
                 List.of(new Item("p1", 5)),
-                false
-        );
-        CompleteOrderResult expectedResult = new CompleteOrderResult(true, "order1");
+                "order1"
 
-        doNothing().when(validationService).validateShopOrderData(orderData);
-        when(stockService.ProcessOrderStock(orderData.getItems(), orderData.getOrderReferenceId(), false)).thenReturn(expectedResult);
+        );
+        ProcessedOrder expectedResult = new ProcessedOrder("order1", true);
+
+        when(stockService.ProcessOrderStock(orderData.getItems(), orderData.getOrderReferenceId())).thenReturn(expectedResult);
 
         // When-Then
         mockMvc.perform(post("/products/process")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(orderData)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(expectedResult.isSuccess()))
+                .andExpect(jsonPath("$.success").value(expectedResult.isCompleted()))
                 .andExpect(jsonPath("$.orderReferenceId").value(expectedResult.getOrderReferenceId()));
     }
 }

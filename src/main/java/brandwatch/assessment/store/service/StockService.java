@@ -1,9 +1,10 @@
 package brandwatch.assessment.store.service;
 
 import brandwatch.assessment.store.dto.*;
+import brandwatch.assessment.store.model.Item;
+import brandwatch.assessment.store.model.ProcessedOrder;
 import brandwatch.assessment.store.model.Product;
 import brandwatch.assessment.store.repository.ProductRepository;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,23 +25,22 @@ public class StockService {
                 .collect(Collectors.toMap(Product::getProductId, Product::getNeeded)));
     }
 
-    public CompleteOrderResult ProcessOrderStock(List<Item> items, String orderReferenceId, boolean isRetried) {
+    public ProcessedOrder ProcessOrderStock(List<Item> items, String orderReferenceId) {
         boolean updateQuantity = true;
-        Map<String, Integer> itemHashSet = items
+        Map<String, Integer> itemsWanted = items
                 .stream()
                 .collect(Collectors.toMap(Item::getProductId, Item::getQuantity));
+        Set<Product> products = productRepository.findAllByProductId(itemsWanted.keySet());
 
-        Set<Product> products = productRepository
-                .findAllByProductId(items.stream().map(Item::getProductId).collect(Collectors.toSet()));
         if (products.isEmpty() || products.size() != items.size()) {
-            return new CompleteOrderResult(false, orderReferenceId);
+            return new ProcessedOrder(orderReferenceId,false);
         }
 
-        // key - product 2. value (new quantity, needed)
-        Map<String, Pair<Integer, Integer>> productsMap = new HashMap<>();
+        Map<String, Integer> quantitiesMap = new HashMap<>();
+        Map<String, Integer> neededMap = new HashMap<>();
 
         for (Product product : products) {
-            int itemQuantity = itemHashSet.get(product.getProductId());
+            int itemQuantity = itemsWanted.get(product.getProductId());
             int productNeeded = product.getNeeded();
             int productQuantity = product.getQuantity();
             int quantityDiff = productQuantity - itemQuantity;
@@ -58,39 +58,34 @@ public class StockService {
                 updateQuantity = false;
             }
 
-            productsMap.put(product.getProductId(), Pair.of(productQuantity, productNeeded));
+            quantitiesMap.put(product.getProductId(), productQuantity);
+            neededMap.put(product.getProductId(), productNeeded);
         }
-        if (!isRetried) {
-            updateProductNeeded(products, productsMap);
-        }
+        updateProductNeeded(products, neededMap);
 
         if (updateQuantity) {
-            updateProductQuantities(products, productsMap);
-            return new CompleteOrderResult(true, orderReferenceId);
+            updateProductQuantities(products, quantitiesMap);
+            return new ProcessedOrder(orderReferenceId, true);
         }
 
-        return new CompleteOrderResult(false, orderReferenceId);
+        return new ProcessedOrder(orderReferenceId, false);
     }
 
-    public CompleteOrderResult2 ProcessRetriedOrderStock2(OrdersForProcessing orders) {
+    public RetryOrdersResult ProcessRetriedOrdersStock(List<OrderData> orders) {
         Map<String, Boolean> processedOrders = new HashMap<>();
-        for (OrderData orderData : orders.getOrders()) {
+
+        for (OrderData orderData : orders) {
             Map<String, Integer> itemsWanted = orderData
                     .getItems()
                     .stream()
                     .collect(Collectors.toMap(Item::getProductId, Item::getQuantity));
-
             Set<Product> productsOfTypeInStock = productRepository.findAllByProductId(itemsWanted.keySet());
-            Map<String, Pair<Integer, Integer>> productsMap = new HashMap<>();
+            Map<String, Integer> productsMap = new HashMap<>();
 
-            if (productsOfTypeInStock.isEmpty() || productsOfTypeInStock.size() != itemsWanted.keySet().size()) {
-                processedOrders.put(orderData.getOrderReferenceId(), false);
-            } else {
+            if (productsOfTypeInStock.size() == itemsWanted.keySet().size()) {
                 boolean updateQuantity = true;
                 for (Product product : productsOfTypeInStock) {
-
                     int itemQuantity = itemsWanted.get(product.getProductId());
-                    int productNeeded = product.getNeeded();
                     int productQuantity = product.getQuantity();
                     int quantityDiff = productQuantity - itemQuantity;
 
@@ -99,8 +94,7 @@ public class StockService {
                     } else {
                         updateQuantity = false;
                     }
-
-                    productsMap.put(product.getProductId(), Pair.of(productQuantity, productNeeded));
+                    productsMap.put(product.getProductId(), productQuantity);
                 }
 
                 if (updateQuantity) {
@@ -109,9 +103,11 @@ public class StockService {
                 } else {
                     processedOrders.put(orderData.getOrderReferenceId(), false);
                 }
+            } else {
+                processedOrders.put(orderData.getOrderReferenceId(), false);
             }
         }
-        return new CompleteOrderResult2(
+        return new RetryOrdersResult(
                 processedOrders
                         .entrySet()
                         .stream()
@@ -129,17 +125,17 @@ public class StockService {
         return products;
     }
 
-    private void updateProductQuantities(Set<Product> products, Map<String, Pair<Integer, Integer>> productsMap) {
+    private void updateProductQuantities(Set<Product> products, Map<String, Integer> quantities) {
         for (Product product : products) {
-            int quantity = productsMap.get(product.getProductId()).getFirst();
+            int quantity = quantities.get(product.getProductId());
             product.setQuantity(quantity);
         }
         productRepository.saveAll(products);
     }
 
-    private void updateProductNeeded(Set<Product> products, Map<String, Pair<Integer, Integer>> productsMap) {
+    private void updateProductNeeded(Set<Product> products, Map<String, Integer> shortages) {
         for (Product product : products) {
-            int needed = productsMap.get(product.getProductId()).getSecond();
+            int needed = shortages.get(product.getProductId());
             product.setNeeded(needed);
         }
         productRepository.saveAll(products);

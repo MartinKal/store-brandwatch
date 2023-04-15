@@ -1,14 +1,13 @@
-package brandwatch.assessment.store.dto;
+package brandwatch.assessment.store.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrdersForProcessing {
-    private List<OrderData> orders;
+public class Item {
+    private String productId;
+    private int quantity;
 }

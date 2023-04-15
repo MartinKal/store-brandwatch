@@ -1,5 +1,6 @@
 package brandwatch.assessment.store.dto;
 
+import brandwatch.assessment.store.model.Item;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

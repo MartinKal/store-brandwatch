@@ -1,10 +1,10 @@
 package brandwatch.assessment.store.controller;
 
-import brandwatch.assessment.store.dto.Item;
+import brandwatch.assessment.store.model.Item;
 import brandwatch.assessment.store.dto.LoadStockRequest;
 import brandwatch.assessment.store.dto.LoadStockResult;
 import brandwatch.assessment.store.model.Product;
-import brandwatch.assessment.store.service.RedisService;
+import brandwatch.assessment.store.service.RedisProducerService;
 import brandwatch.assessment.store.service.StockService;
 import brandwatch.assessment.store.service.ValidationService;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +20,12 @@ public class StockController {
 
     private final StockService stockService;
     private final ValidationService validationService;
-    private final RedisService redisService;
+    private final RedisProducerService redisProducerService;
 
-    public StockController(StockService stockService, ValidationService validationService, RedisService redisService) {
+    public StockController(StockService stockService, ValidationService validationService, RedisProducerService redisProducerService) {
         this.stockService = stockService;
         this.validationService = validationService;
-        this.redisService = redisService;
+        this.redisProducerService = redisProducerService;
     }
 
     @GetMapping("/shortages")
@@ -41,7 +41,7 @@ public class StockController {
         Map<String, Integer> items = products
                 .stream()
                 .collect(Collectors.toMap(Product::getProductId, Product::getQuantity));
-        redisService.sendInStockMessage("stock:load", items);
+        redisProducerService.sendInStockMessage("stock:load", items);
 
         return ResponseEntity.ok(
                 new LoadStockResult(

@@ -1,9 +1,9 @@
 package brandwatch.assessment.store.controller;
 
-import brandwatch.assessment.store.dto.Item;
+import brandwatch.assessment.store.model.Item;
 import brandwatch.assessment.store.dto.LoadStockRequest;
 import brandwatch.assessment.store.model.Product;
-import brandwatch.assessment.store.service.RedisService;
+import brandwatch.assessment.store.service.RedisProducerService;
 import brandwatch.assessment.store.service.StockService;
 import brandwatch.assessment.store.service.ValidationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +36,7 @@ public class StockControllerTest {
     private ValidationService validationService;
 
     @Mock
-    private RedisService redisService;
+    private RedisProducerService redisProducerService;
 
     @InjectMocks
     private StockController stockController;
@@ -48,7 +48,7 @@ public class StockControllerTest {
     public void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(stockController).build();
         objectMapper = new ObjectMapper();
-        stockController = new StockController(stockService, validationService, redisService);
+        stockController = new StockController(stockService, validationService, redisProducerService);
     }
 
     @Test
