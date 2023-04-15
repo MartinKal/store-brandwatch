@@ -1,7 +1,6 @@
 package brandwatch.assessment.store.service;
 
-import brandwatch.assessment.store.dto.Item;
-import brandwatch.assessment.store.dto.CompleteOrderResult;
+import brandwatch.assessment.store.dto.*;
 import brandwatch.assessment.store.model.Product;
 import brandwatch.assessment.store.repository.ProductRepository;
 import org.springframework.data.util.Pair;
@@ -73,6 +72,53 @@ public class StockService {
         return new CompleteOrderResult(false, orderReferenceId);
     }
 
+    public CompleteOrderResult2 ProcessRetriedOrderStock2(OrdersForProcessing orders) {
+        Map<String, Boolean> processedOrders = new HashMap<>();
+        for (OrderData orderData : orders.getOrders()) {
+            Map<String, Integer> itemsWanted = orderData
+                    .getItems()
+                    .stream()
+                    .collect(Collectors.toMap(Item::getProductId, Item::getQuantity));
+
+            Set<Product> productsOfTypeInStock = productRepository.findAllByProductId(itemsWanted.keySet());
+            Map<String, Pair<Integer, Integer>> productsMap = new HashMap<>();
+
+            if (productsOfTypeInStock.isEmpty() || productsOfTypeInStock.size() != itemsWanted.keySet().size()) {
+                processedOrders.put(orderData.getOrderReferenceId(), false);
+            } else {
+                boolean updateQuantity = true;
+                for (Product product : productsOfTypeInStock) {
+
+                    int itemQuantity = itemsWanted.get(product.getProductId());
+                    int productNeeded = product.getNeeded();
+                    int productQuantity = product.getQuantity();
+                    int quantityDiff = productQuantity - itemQuantity;
+
+                    if (quantityDiff >= 0) {
+                        productQuantity = quantityDiff;
+                    } else {
+                        updateQuantity = false;
+                    }
+
+                    productsMap.put(product.getProductId(), Pair.of(productQuantity, productNeeded));
+                }
+
+                if (updateQuantity) {
+                    updateProductQuantities(productsOfTypeInStock, productsMap);
+                    processedOrders.put(orderData.getOrderReferenceId(), true);
+                } else {
+                    processedOrders.put(orderData.getOrderReferenceId(), false);
+                }
+            }
+        }
+        return new CompleteOrderResult2(
+                processedOrders
+                        .entrySet()
+                        .stream()
+                        .map(order -> new ProcessedOrder(order.getKey(), order.getValue()))
+                        .collect(Collectors.toList()));
+    }
+
     public List<Product> addOrUpdateStock(List<Item> items) {
         List<Product> products = new ArrayList<>();
         for (Item item : items) {
@@ -84,7 +130,7 @@ public class StockService {
     }
 
     private void updateProductQuantities(Set<Product> products, Map<String, Pair<Integer, Integer>> productsMap) {
-        for (Product product: products) {
+        for (Product product : products) {
             int quantity = productsMap.get(product.getProductId()).getFirst();
             product.setQuantity(quantity);
         }

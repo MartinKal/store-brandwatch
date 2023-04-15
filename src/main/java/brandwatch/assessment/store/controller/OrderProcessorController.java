@@ -1,5 +1,7 @@
 package brandwatch.assessment.store.controller;
 
+import brandwatch.assessment.store.dto.CompleteOrderResult2;
+import brandwatch.assessment.store.dto.OrdersForProcessing;
 import brandwatch.assessment.store.dto.ShopOrderData;
 import brandwatch.assessment.store.dto.CompleteOrderResult;
 import brandwatch.assessment.store.service.StockService;
@@ -28,5 +30,13 @@ public class OrderProcessorController {
         CompleteOrderResult inStock = stockService
                 .ProcessOrderStock(orderData.getItems(), orderData.getOrderReferenceId(), orderData.isRetriedOrder());
         return ResponseEntity.ok(inStock);
+    }
+
+    @PostMapping("/process2")
+    public ResponseEntity<CompleteOrderResult2> processShopOrderStock2(@RequestBody OrdersForProcessing orders) {
+        //validationService.validateShopOrderData(orders);
+        CompleteOrderResult2 processedOrders = stockService
+                .ProcessRetriedOrderStock2(orders);
+        return ResponseEntity.ok(processedOrders);
     }
 }
