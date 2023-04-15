@@ -84,12 +84,13 @@ Response example:
   }
 ]
 ```
+## Order Processor Service
+The Order Processor Service is a RESTful API that provides two endpoints for processing and retrying orders based on their stock availability. It uses the StockService for processing the orders.<br/>
 
-### 3. URL: /products/process - for internal use
 
-**Method:** POST
-**Request Body:** A JSON object containing a list of items with product ID, quantity, and order reference ID. <br />
-**Description:** This endpoint processes a shop order and checks if the required stock is available. 
+### 1. Process a Single Order (POST /orders/process)
+
+This endpoint processes a shop order and checks if the required stock is available. 
 It returns a result indicating whether the order can be completed or not.
 
 Request body example:
@@ -115,6 +116,11 @@ Response example:
   "orderReferenceId": "<order_id>"
 }
 ```
+
+### 2. Retry Multiple Orders (POST /orders/retry)
+This endpoint retries processing multiple orders, checking for the stock availability of their items.
+
+
 ## Shop component
 The Shop component allows the clients to order more or new products. When the products are
 available, their orders are processed, and the products are taken from the store.<br/>
