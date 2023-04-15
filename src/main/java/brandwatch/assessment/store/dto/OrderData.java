@@ -4,14 +4,13 @@ import brandwatch.assessment.store.model.Item;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import java.util.List;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class LoadStockRequest {
-    @NonNull
+public class OrderData {
     private List<Item> items;
+    private String orderReferenceId;
 }

@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class RedisService {
+public class RedisProducerService {
     private final RedisTemplate<String, String> redisTemplate;
 
-    public RedisService(RedisTemplate<String, String> redisTemplate) {
+    public RedisProducerService(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 

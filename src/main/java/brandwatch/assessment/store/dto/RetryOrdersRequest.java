@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class CompleteOrderResult {
-    private boolean success;
-    private String orderReferenceId;
+@AllArgsConstructor
+public class RetryOrdersRequest {
+    private List<OrderData> orders;
 }

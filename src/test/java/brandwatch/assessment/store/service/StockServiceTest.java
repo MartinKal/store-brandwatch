@@ -1,7 +1,7 @@
 package brandwatch.assessment.store.service;
 
-import brandwatch.assessment.store.dto.CompleteOrderResult;
-import brandwatch.assessment.store.dto.Item;
+import brandwatch.assessment.store.model.ProcessedOrder;
+import brandwatch.assessment.store.model.Item;
 import brandwatch.assessment.store.model.Product;
 import brandwatch.assessment.store.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,10 +65,10 @@ public class StockServiceTest {
         when(repository.findAllByProductId(any())).thenReturn(products);
 
         // When
-        CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId, false);
+        ProcessedOrder result = stockService.ProcessOrderStock(items, orderReferenceId);
 
         // Then
-        assertTrue(result.isSuccess());
+        assertTrue(result.isCompleted());
         assertEquals(orderReferenceId, result.getOrderReferenceId());
     }
 
@@ -87,10 +87,10 @@ public class StockServiceTest {
         when(repository.findAllByProductId(any())).thenReturn(products);
 
         // When
-        CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId, false);
+        ProcessedOrder result = stockService.ProcessOrderStock(items, orderReferenceId);
 
         // Then
-        assertFalse(result.isSuccess());
+        assertFalse(result.isCompleted());
         assertEquals(orderReferenceId, result.getOrderReferenceId());
     }
 
@@ -108,10 +108,10 @@ public class StockServiceTest {
         when(repository.findAllByProductId(any())).thenReturn(products);
 
         // When
-        CompleteOrderResult result = stockService.ProcessOrderStock(items, orderReferenceId, false);
+        ProcessedOrder result = stockService.ProcessOrderStock(items, orderReferenceId);
 
         // Then
-        assertFalse(result.isSuccess());
+        assertFalse(result.isCompleted());
         assertEquals(orderReferenceId, result.getOrderReferenceId());
     }
 

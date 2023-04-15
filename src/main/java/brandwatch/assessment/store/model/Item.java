@@ -1,4 +1,4 @@
-package brandwatch.assessment.store.dto;
+package brandwatch.assessment.store.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
